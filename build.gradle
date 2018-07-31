@@ -1,0 +1,44 @@
+group 'vitalyros.diceformula'
+version '0.1'
+
+buildscript {
+    ext.kotlin_version = '1.2.10'
+    ext.junit_version = '4.12'
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}
+
+allprojects {
+    ext.license = 'MIT'
+
+    apply plugin: 'java'
+    apply plugin: 'kotlin'
+
+    dependencies {
+        compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jre8', version: kotlin_version
+
+        testCompile group: 'junit', name: 'junit', version:  junit_version
+    }
+
+    compileKotlin {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    compileJava {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+}

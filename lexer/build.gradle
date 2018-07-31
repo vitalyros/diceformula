@@ -1,0 +1,59 @@
+group project.parent.group
+version project.parent.version
+
+buildscript {
+    ext.ragelGraphviz = "$buildDir/generated/graph"
+    ext.ragelJavaSources = "$buildDir/generated/java"
+    ext.ragelSourceDir = file('src/main/ragel')
+    ext.ragelGenerateDir = file("$ragelJavaSources/vitalyros/diceformula/lexer")
+    ext.graphDir = file(ragelGraphviz)
+    ext.exec = { cmd ->
+        def proc = cmd.execute()
+        proc.in.eachLine {line -> println line}
+        proc.err.eachLine {line -> println 'ERROR: ' + line}
+        proc.waitFor()
+    }
+}
+
+
+task generateRagelSrc() {
+    inputs.dir ragelSourceDir
+    outputs.dir ragelGenerateDir
+    doFirst {
+        ragelGenerateDir.mkdirs()
+        inputs.getFiles().each { file ->
+            exec('ragel -J -o ' + (ragelGenerateDir.getPath() + '/' + file.name.replaceAll('.rl$', '.java') + ' ') + file)
+        }
+    }
+}
+
+task generateRagelGraph() {
+    inputs.dir ragelSourceDir
+    outputs.dir graphDir
+    doFirst {
+        graphDir.mkdirs()
+        inputs.getFiles().each { file ->
+            def resultFile = graphDir.getPath() + '/' + file.name.replaceAll('.rl$', '.dot')
+            exec('ragel -Vp -o ' + resultFile + ' ' + file)
+            exec('dot -T pdf ' + resultFile + ' -O')
+        }
+    }
+}
+
+task ragel
+ragel.dependsOn generateRagelSrc
+ragel.dependsOn generateRagelGraph
+
+sourceSets {
+    main {
+        java {
+            srcDirs ragelJavaSources
+        }
+        kotlin {
+            srcDirs "src/main/kotlin"
+        }
+    }
+}
+
+compileKotlin.dependsOn ragel
+compileJava.dependsOn ragel
