@@ -37,6 +37,8 @@ main := |*
 
 package vitalyros.diceformula.lexer;
 
+import vitalyros.diceformula.common.Parser;
+import vitalyros.diceformula.common.TokenType;
 import java.util.*;
 
 public class Lexer extends BaseLexer {

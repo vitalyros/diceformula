@@ -1,9 +1,9 @@
 import org.junit.Assert.*
 import vitalyros.diceformula.lexer.Lexer
 import org.junit.Test
-import vitalyros.diceformula.lexer.Parser
-import vitalyros.diceformula.lexer.Token
-import vitalyros.diceformula.lexer.TokenType
+import vitalyros.diceformula.common.Parser
+import vitalyros.diceformula.common.Token
+import vitalyros.diceformula.common.TokenType
 
 class LexerTest {
     @Test

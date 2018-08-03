@@ -1,4 +1,4 @@
-package vitalyros.diceformula.lexer
+package vitalyros.diceformula.common
 
 data class Token(val Type : TokenType, val col: Int, val str: String)
 
