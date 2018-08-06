@@ -1,11 +1,12 @@
 import org.junit.Assert.*
-import vitalyros.diceformula.lexer.Lexer
+import vitalyros.diceformula.lexer.RagelLexer
 import org.junit.Test
-import vitalyros.diceformula.common.Parser
-import vitalyros.diceformula.common.Token
-import vitalyros.diceformula.common.TokenType
+import vitalyros.diceformula.parser.Parser
+import vitalyros.diceformula.lexer.Token
+import vitalyros.diceformula.lexer.TokenType
+import vitalyros.diceformula.parser.Expression
 
-class LexerTest {
+class RagelLexerTest {
     @Test
     fun testDice() = testLexer("d6",
             listOf(Token(TokenType.DICE, 0, "d6")))
@@ -17,7 +18,7 @@ class LexerTest {
 
     @Test
     fun testMultiDice2() = testLexer("20 * d6",
-            listOf(Token(TokenType.TIMES, 0, "20 *"),
+            listOf(Token(TokenType.MULT, 0, "20 *"),
                     Token(TokenType.DICE, 5, "d6")))
 
 
@@ -32,7 +33,7 @@ class LexerTest {
 
     @Test
     fun testMultiDice4() = testLexer("20 * (d6 + 5)",
-            listOf(Token(TokenType.TIMES, 0, "20 *"),
+            listOf(Token(TokenType.MULT, 0, "20 *"),
                     Token(TokenType.OPEN_BRACE, 5, "("),
                     Token(TokenType.DICE, 6, "d6"),
                     Token(TokenType.PLUS, 9, "+"),
@@ -103,7 +104,7 @@ class LexerTest {
 
     fun testLexer(text: String, expected: List<Token>) {
         val parser = ListParser()
-        val lexer = Lexer(parser)
+        val lexer = RagelLexer(parser)
         lexer.runLexer(text.toByteArray(Charsets.UTF_8))
         assertEquals(expected, parser.tokens)
     }
@@ -112,5 +113,9 @@ class LexerTest {
 class ListParser(val tokens: ArrayList<Token> = ArrayList()) : Parser {
     override fun push(token: Token) {
         tokens.add(token)
+    }
+
+    override fun finish(): Expression {
+        throw NotImplementedError()
     }
 }

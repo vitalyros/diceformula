@@ -7,7 +7,7 @@ int = [1-9][0-9]*;
 
 dice = 'd' int;
 
-times = int space* '*';
+mult = int space* '*';
 
 plus = '+';
 minus = '-';
@@ -23,7 +23,7 @@ main := |*
   minus => { emit(data, ts, te, TokenType.MINUS); };
 
   int => { emit(data, ts, te, TokenType.INT); };
-  times => { emit(data, ts, te, TokenType.TIMES); };
+  mult => { emit(data, ts, te, TokenType.MULT); };
 
   fun_start => { emit(data, ts, te, TokenType.FUN_START); };
   open_brace => { emit(data, ts, te, TokenType.OPEN_BRACE); };
@@ -37,12 +37,12 @@ main := |*
 
 package vitalyros.diceformula.lexer;
 
-import vitalyros.diceformula.common.Parser;
-import vitalyros.diceformula.common.TokenType;
+import vitalyros.diceformula.parser.Parser;
+import vitalyros.diceformula.lexer.TokenType;
 import java.util.*;
 
-public class Lexer extends BaseLexer {
-    public Lexer(Parser parser) {
+public class RagelLexer extends BaseLexer {
+    public RagelLexer(Parser parser) {
         super(parser);
     }
 

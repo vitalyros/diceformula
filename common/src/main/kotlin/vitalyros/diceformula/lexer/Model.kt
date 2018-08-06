@@ -1,4 +1,4 @@
-package vitalyros.diceformula.common
+package vitalyros.diceformula.lexer
 
 data class Token(val Type : TokenType, val col: Int, val str: String)
 
@@ -7,7 +7,7 @@ enum class TokenType {
     INT,
     PLUS,
     MINUS,
-    TIMES,
+    MULT,
     OPEN_BRACE,
     CLOSE_BRACE,
     FUN_START

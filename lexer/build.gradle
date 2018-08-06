@@ -15,6 +15,10 @@ buildscript {
     }
 }
 
+dependencies {
+    compile project(":common")
+}
+
 
 task generateRagelSrc() {
     inputs.dir ragelSourceDir
