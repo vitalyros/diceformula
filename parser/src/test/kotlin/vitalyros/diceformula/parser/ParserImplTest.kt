@@ -100,6 +100,47 @@ class ParserImplTest {
     }
 
 
+    @Test
+    fun testMultSugar1() {
+        val result = parse(listOf(
+                Token(TokenType.INT, 0, "10"),
+                Token(TokenType.DICE, 0, "d20")))
+        assertEquals(Mult(10, DiceLiteral(20)), result)
+    }
+
+    @Test
+    fun testMultSugar2() {
+        val result = parse(listOf(
+                Token(TokenType.INT, 0, "10"),
+                Token(TokenType.OPEN_BRACE, 2,  "("),
+                Token(TokenType.INT, 0, "15"),
+                Token(TokenType.DICE, 2, "d6"),
+                Token(TokenType.MINUS, 3, "-"),
+                Token(TokenType.INT, 4, "5"),
+                Token(TokenType.CLOSE_BRACE, 2,  ")")))
+        assertEquals(Mult(10, Braces(Dif(Mult(15, DiceLiteral(6)), IntLiteral(5)))), result)
+    }
+
+    @Test
+    fun testMultSugar3() {
+        val result = parse(listOf(
+                Token(TokenType.INT, 0, "10"),
+                Token(TokenType.FUN_START, 2,  "somefun("),
+                Token(TokenType.INT, 0, "15"),
+                Token(TokenType.DICE, 0, "d20"),
+                Token(TokenType.CLOSE_BRACE, 2,  ")")))
+        assertEquals(Mult(10, Fun("somefun", Mult(15, DiceLiteral(20)))), result)
+    }
+
+    @Test
+    fun testMultSugar4() {
+        val result = parse(listOf(
+                Token(TokenType.MULT, 0, "20 *"),
+                Token(TokenType.INT, 1, "10"),
+                Token(TokenType.DICE, 0, "d20")))
+        assertEquals(Mult(20, Mult(10, DiceLiteral(20))), result)
+    }
+
     @Test(expected = ParserException::class)
     fun testEmpty() {
         val parser = ParserImpl()

@@ -7,31 +7,36 @@ import java.util.*
 
 class ParserImpl : Parser {
     private val funNameChars = ('a'..'z')
-    private val intChars = ('0' .. '9')
+    private val intChars = ('0'..'9')
     private val pendingStack: Deque<PendingExpression> = ArrayDeque()
-    private var lastFinished: Expression? = null
+    private var finishedStack: Deque<Expression> = ArrayDeque()
 
     override fun push(token: Token) {
         when (token.Type) {
             TokenType.INT -> {
-                lastFinished = parseInt(token)
+                finishedStack.push(parseInt(token))
                 checkFinishedPlusMinus()
             }
             TokenType.DICE -> {
-                lastFinished = parseDice(token)
+                checkMultSugar()
+                finishedStack.push(parseDice(token))
+                collapsePendingMult()
                 checkFinishedPlusMinus()
-                checkFinishedMult()
             }
             TokenType.PLUS -> {
+                val lastFinished = finishedStack.peek()
                 pendingStack.push(PendingSum(validatePlusMinus(token, lastFinished)))
             }
             TokenType.MINUS -> {
+                val lastFinished = finishedStack.peek()
                 pendingStack.push(PendingDif(validatePlusMinus(token, lastFinished)))
             }
             TokenType.FUN_START -> {
+                checkMultSugar()
                 pendingStack.push(parseFun(token))
             }
             TokenType.OPEN_BRACE -> {
+                checkMultSugar()
                 pendingStack.push(PendingBraces(token))
             }
             TokenType.CLOSE_BRACE -> {
@@ -45,30 +50,35 @@ class ParserImpl : Parser {
         }
     }
 
+    fun checkMultSugar() {
+        val lastFinished = finishedStack.peek()
+        if (lastFinished != null && lastFinished is IntLiteral) {
+            finishedStack.pop()
+            pendingStack.push(PendingMult(lastFinished.value))
+        }
+    }
+
     fun checkFinishedMult() {
-        val exp = lastFinished
+        val exp = finishedStack.peek()
         if (exp != null && exp !is PendingExpression) {
             checkFinishedMult(exp)
         }
     }
-
 
     fun checkFinishedMult(exp: Expression) {
         if (pendingStack.size > 0) {
             val lastPending = pendingStack.peek()
             when (lastPending) {
                 is PendingMult -> {
-                    this.lastFinished = Mult(lastPending.mult, exp)
+                    finishedStack.push(Mult(lastPending.mult, exp))
                     pendingStack.pop()
                 }
             }
         }
     }
 
-
-
     fun checkFinishedBraces() {
-        val exp = lastFinished
+        val exp = finishedStack.peek()
         if (exp != null && exp !is PendingExpression) {
             checkFinishedBraces(exp)
         }
@@ -79,20 +89,41 @@ class ParserImpl : Parser {
             val lastPending = pendingStack.peek()
             when (lastPending) {
                 is PendingBraces -> {
-                    this.lastFinished = Braces(exp)
+                    finishedStack.push(Braces(exp))
                     pendingStack.pop()
                 }
                 is PendingFun -> {
-                    this.lastFinished = Fun(lastPending.name, exp)
+                    finishedStack.push(Fun(lastPending.name, exp))
                     pendingStack.pop()
                 }
             }
         }
     }
 
+    fun collapsePendingMult() {
+        var finishedCollapsing = false
+        while (!finishedCollapsing && pendingStack.size > 0) {
+            val depthBefore = pendingStack.size
+
+            val lastFinished = finishedStack.peek()
+            val lastPending = pendingStack.peek()
+            if (lastFinished != null) {
+                when (lastPending) {
+                    is PendingMult -> {
+                        finishedStack.push(Braces(lastFinished))
+                        pendingStack.pop()
+                    }
+                }
+            }
+
+            val depthAfter = pendingStack.size
+            finishedCollapsing = depthAfter == depthBefore
+        }
+    }
+
 
     fun checkFinishedPlusMinus() {
-        val exp2 = lastFinished
+        val exp2 = finishedStack.peek()
         if (exp2 != null && exp2 !is PendingExpression) {
             checkFinishedPlusMinus(exp2)
         }
@@ -103,11 +134,11 @@ class ParserImpl : Parser {
             val lastPending = pendingStack.peek()
             when (lastPending) {
                 is PendingSum -> {
-                    this.lastFinished = Sum(lastPending.exp1, exp2)
+                    finishedStack.push(Sum(lastPending.exp1, exp2))
                     pendingStack.pop()
                 }
                 is PendingDif -> {
-                    this.lastFinished = Dif(lastPending.exp1, exp2)
+                    finishedStack.push(Dif(lastPending.exp1, exp2))
                     pendingStack.pop()
                 }
             }
@@ -123,7 +154,7 @@ class ParserImpl : Parser {
     }
 
     override fun finish(): Expression {
-        val result = lastFinished
+        val result = finishedStack.peek()
         if (result == null) {
             if (pendingStack.isEmpty()) {
                 throw ParserException("Empty expression")
