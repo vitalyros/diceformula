@@ -24,10 +24,12 @@ class ParserImpl : Parser {
                 checkFinishedPlusMinus()
             }
             TokenType.PLUS -> {
+                collapseLastInt()
                 val lastFinished = finishedStack.peek()
                 pendingStack.push(PendingSum(validatePlusMinus(token, lastFinished)))
             }
             TokenType.MINUS -> {
+                collapseLastInt()
                 val lastFinished = finishedStack.peek()
                 pendingStack.push(PendingDif(validatePlusMinus(token, lastFinished)))
             }
@@ -41,12 +43,19 @@ class ParserImpl : Parser {
             }
             TokenType.CLOSE_BRACE -> {
                 checkFinishedBraces()
+                collapsePendingMult()
                 checkFinishedPlusMinus()
-                checkFinishedMult()
             }
-            TokenType.MULT -> {
+            TokenType.TIMES -> {
                 pendingStack.push(parseMult(token))
             }
+        }
+    }
+
+    fun collapseLastInt() {
+        val lastFinished = finishedStack.peek()
+        if (lastFinished != null && lastFinished is IntLiteral) {
+            collapsePendingMult()
         }
     }
 
@@ -104,18 +113,16 @@ class ParserImpl : Parser {
         var finishedCollapsing = false
         while (!finishedCollapsing && pendingStack.size > 0) {
             val depthBefore = pendingStack.size
-
             val lastFinished = finishedStack.peek()
             val lastPending = pendingStack.peek()
             if (lastFinished != null) {
                 when (lastPending) {
                     is PendingMult -> {
-                        finishedStack.push(Braces(lastFinished))
+                        finishedStack.push(Mult(lastPending.mult, lastFinished))
                         pendingStack.pop()
                     }
                 }
             }
-
             val depthAfter = pendingStack.size
             finishedCollapsing = depthAfter == depthBefore
         }
@@ -154,6 +161,10 @@ class ParserImpl : Parser {
     }
 
     override fun finish(): Expression {
+        System.out.println(finishedStack)
+        System.out.println(pendingStack)
+        collapseLastInt()
+
         val result = finishedStack.peek()
         if (result == null) {
             if (pendingStack.isEmpty()) {
