@@ -18,7 +18,7 @@ class RagelLexerTest {
 
     @Test
     fun testMultiDice2() = testLexer("20 * d6",
-            listOf(Token(TokenType.MULT, 0, "20 *"),
+            listOf(Token(TokenType.TIMES, 0, "20 *"),
                     Token(TokenType.DICE, 5, "d6")))
 
 
@@ -33,7 +33,7 @@ class RagelLexerTest {
 
     @Test
     fun testMultiDice4() = testLexer("20 * (d6 + 5)",
-            listOf(Token(TokenType.MULT, 0, "20 *"),
+            listOf(Token(TokenType.TIMES, 0, "20 *"),
                     Token(TokenType.OPEN_BRACE, 5, "("),
                     Token(TokenType.DICE, 6, "d6"),
                     Token(TokenType.PLUS, 9, "+"),

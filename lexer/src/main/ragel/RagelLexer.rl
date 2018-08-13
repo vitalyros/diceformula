@@ -7,7 +7,7 @@ int = [1-9][0-9]*;
 
 dice = 'd' int;
 
-mult = int space* '*';
+times = int space* '*';
 
 plus = '+';
 minus = '-';
@@ -23,7 +23,7 @@ main := |*
   minus => { emit(data, ts, te, TokenType.MINUS); };
 
   int => { emit(data, ts, te, TokenType.INT); };
-  mult => { emit(data, ts, te, TokenType.MULT); };
+  times => { emit(data, ts, te, TokenType.TIMES); };
 
   fun_start => { emit(data, ts, te, TokenType.FUN_START); };
   open_brace => { emit(data, ts, te, TokenType.OPEN_BRACE); };

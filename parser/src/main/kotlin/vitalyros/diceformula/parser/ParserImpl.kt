@@ -49,7 +49,7 @@ class ParserImpl : Parser {
                 collapseMult()
                 collapsePlusMinus()
             }
-            TokenType.MULT -> {
+            TokenType.TIMES -> {
                 pendingStack.push(parseMult(token))
             }
         }
@@ -123,7 +123,6 @@ class ParserImpl : Parser {
         var finishedCollapsing = false
         while (!finishedCollapsing && pendingStack.size > 0) {
             val depthBefore = pendingStack.size
-
             val lastFinished = finishedStack.peek()
             val lastPending = pendingStack.peek()
             if (lastFinished != null) {
@@ -134,7 +133,6 @@ class ParserImpl : Parser {
                     }
                 }
             }
-
             val depthAfter = pendingStack.size
             finishedCollapsing = depthAfter == depthBefore
         }

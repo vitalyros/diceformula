@@ -7,7 +7,7 @@ enum class TokenType {
     INT,
     PLUS,
     MINUS,
-    MULT,
+    TIMES,
     OPEN_BRACE,
     CLOSE_BRACE,
     FUN_START
