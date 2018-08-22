@@ -192,6 +192,17 @@ class ParserImplTest {
     }
 
     @Test
+    fun testSumPrecedence() {
+        val result = parse(listOf(
+                Token(TokenType.INT, 0, "1"),
+                Token(TokenType.PLUS, 0, "+"),
+                Token(TokenType.INT, 0, "2"),
+                Token(TokenType.MINUS, 0, "-"),
+                Token(TokenType.INT, 0, "3")))
+        assertEquals(Dif(Sum(IntLiteral(1), IntLiteral(2)), IntLiteral(3)), result)
+    }
+
+    @Test
     fun testMultDifSumPrecedence_Short() {
         val result = parse(listOf(
                 Token(TokenType.TIMES, 0, "2 *"),
