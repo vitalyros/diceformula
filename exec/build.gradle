@@ -1,0 +1,6 @@
+group project.parent.group
+version project.parent.version
+
+dependencies {
+    compile project(":common")
+}
