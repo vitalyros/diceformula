@@ -9,7 +9,7 @@ class SyntaxImpl : Syntax {
             is IntLiteral -> UseInt(e.value)
 
             is Sum -> buildSum(e)
-            is Dif -> buildDif(e)
+            is Neg -> buildNeg(e)
             is Fun -> buildFun(e)
 
             is Mult -> buildMult(e)
@@ -64,19 +64,12 @@ class SyntaxImpl : Syntax {
         }
     }
 
-    private fun buildDif(e : Dif) : Operation {
-        val op1 = build(e.exp1)
-        val op2 = build(e.exp2)
-        if (op1 !is IntOperation) {
-            throw SyntaxException("Left side of a dif expected to return integer. ${e.exp1}")
-        }
-        if (op2 !is IntOperation) {
-            throw SyntaxException("Right side of a dif expected to return integer. ${e.exp2}")
-        }
-        return if (op1 is DiceOperation || op2 is DiceOperation) {
-            DiceSum(op1, op2)
+    private fun buildNeg(e: Neg) : Operation {
+        val op = build(e.exp)
+        if (op !is IntOperation) {
+            throw SyntaxException("Right side of a dif expected to return integer. ${e.exp}")
         } else {
-            IntSum(op1, UseNegativeInt(op2))
+            return NegateInt(op)
         }
     }
 }

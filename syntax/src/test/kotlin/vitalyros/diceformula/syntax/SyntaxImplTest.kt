@@ -24,27 +24,27 @@ class SyntaxImplTest {
         assertEquals(
                 IntSum(
                         MultByInt(1, IntSum(UseInt(2), UseInt(3))),
-                        UseNegativeInt(MultByInt(4, IntSum(
+                        NegateInt(MultByInt(4, IntSum(
                                 MultByInt(5, IntSum(UseInt(6), UseInt(7))),
-                                MultByInt(8, MultByInt(9, IntSum(UseInt(10), UseNegativeInt(UseInt(11)))))
+                                MultByInt(8, MultByInt(9, IntSum(UseInt(10), NegateInt(UseInt(11)))))
                         ))))
                 ,
                 syntax.build(
                         //  1 * (2 + 3) - 4 * ( 5 * (6 + 7) + 8 * 9 * (10 - 11))
-                        Dif(
+                        Sum(
                                 //  1 * (2 + 3)
                                 Mult(1, Braces(Sum(IntLiteral(2), IntLiteral(3)))),
                                 //  4 * ( 5 * (6 + 7) + 8 * 9 * (10 - 11))
-                                Mult(4, Braces(Sum(
+                                Neg(Mult(4, Braces(Sum(
                                         // 5 * (6 + 7)
                                         Mult(5, Braces(Sum(IntLiteral(6), IntLiteral(7)))),
                                         // 8 * 9 * (10 - 11)
-                                        Mult(8, Mult(9, Braces(Dif(IntLiteral(10), IntLiteral(11)))))
-                                )))
+                                        Mult(8, Mult(9, Braces(Sum(IntLiteral(10), Neg(IntLiteral(11))))))
+                                ))))
                         )
                 ))
     }
-    
+
     @Test
     fun testDiceLiteral() {
         assertEquals(RollDice(20),

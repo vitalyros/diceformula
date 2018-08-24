@@ -42,7 +42,7 @@ class ParserImplTest {
         val result = parse(listOf(Token(TokenType.DICE, 0, "d20"),
                 Token(TokenType.MINUS, 1, "-"),
                 Token(TokenType.INT, 2, "5")))
-        assertEquals(Dif(DiceLiteral(20), IntLiteral(5)), result)
+        assertEquals(Sum(DiceLiteral(20), Neg(IntLiteral(5))), result)
     }
 
     @Test
@@ -52,7 +52,7 @@ class ParserImplTest {
                 Token(TokenType.DICE, 2, "d6"),
                 Token(TokenType.MINUS, 3, "-"),
                 Token(TokenType.INT, 4, "5")))
-        assertEquals(Dif(Dif(DiceLiteral(20), DiceLiteral(6)), IntLiteral(5)), result)
+        assertEquals(Sum(Sum(DiceLiteral(20), Neg(DiceLiteral(6))), Neg(IntLiteral(5))), result)
     }
 
     @Test
@@ -64,7 +64,7 @@ class ParserImplTest {
                 Token(TokenType.MINUS, 3, "-"),
                 Token(TokenType.INT, 4, "5"),
                 Token(TokenType.CLOSE_BRACE, 2, ")")))
-        assertEquals(Dif(DiceLiteral(20), Braces(Dif(DiceLiteral(6), IntLiteral(5)))), result)
+        assertEquals(Sum(DiceLiteral(20), Neg(Braces(Sum(DiceLiteral(6), Neg(IntLiteral(5)))))), result)
     }
 
     @Test
@@ -87,7 +87,7 @@ class ParserImplTest {
                 Token(TokenType.MINUS, 3, "-"),
                 Token(TokenType.INT, 4, "5"),
                 Token(TokenType.CLOSE_BRACE, 2, ")")))
-        assertEquals(Dif(DiceLiteral(20), Fun("somefun", Dif(DiceLiteral(6), IntLiteral(5)))), result)
+        assertEquals(Sum(DiceLiteral(20), Neg(Fun("somefun", Sum(DiceLiteral(6), Neg(IntLiteral(5)))))), result)
     }
 
     @Test
@@ -107,7 +107,7 @@ class ParserImplTest {
                 Token(TokenType.MINUS, 3, "-"),
                 Token(TokenType.INT, 4, "5"),
                 Token(TokenType.CLOSE_BRACE, 2, ")")))
-        assertEquals(Mult(10, Braces(Dif(DiceLiteral(6), IntLiteral(5)))), result)
+        assertEquals(Mult(10, Braces(Sum(DiceLiteral(6), Neg(IntLiteral(5))))), result)
     }
 
     @Test
@@ -137,7 +137,7 @@ class ParserImplTest {
                 Token(TokenType.MINUS, 3, "-"),
                 Token(TokenType.INT, 4, "5"),
                 Token(TokenType.CLOSE_BRACE, 2, ")")))
-        assertEquals(Mult(10, Braces(Dif(Mult(15, DiceLiteral(6)), IntLiteral(5)))), result)
+        assertEquals(Mult(10, Braces(Sum(Mult(15, DiceLiteral(6)), Neg(IntLiteral(5))))), result)
     }
 
     @Test
@@ -159,7 +159,6 @@ class ParserImplTest {
                 Token(TokenType.DICE, 0, "d20")))
         assertEquals(Mult(20, Mult(10, DiceLiteral(20))), result)
     }
-
     @Test
     fun testMultChain() {
         val result = parse(listOf(
@@ -199,7 +198,20 @@ class ParserImplTest {
                 Token(TokenType.INT, 0, "2"),
                 Token(TokenType.MINUS, 0, "-"),
                 Token(TokenType.INT, 0, "3")))
-        assertEquals(Dif(Sum(IntLiteral(1), IntLiteral(2)), IntLiteral(3)), result)
+        assertEquals(Sum(Sum(IntLiteral(1), IntLiteral(2)), Neg(IntLiteral(3))), result)
+    }
+
+    @Test
+    fun testBracePrecedence() {
+        val result = parse(listOf(
+                Token(TokenType.INT, 0, "1"),
+                Token(TokenType.MINUS, 0, "-"),
+                Token(TokenType.OPEN_BRACE, 0, "("),
+                Token(TokenType.INT, 0, "2"),
+                Token(TokenType.MINUS, 0, "-"),
+                Token(TokenType.INT, 0, "3"),
+                Token(TokenType.CLOSE_BRACE, 0, ")")))
+        assertEquals(Sum(IntLiteral(1), Neg(Braces(Sum(IntLiteral(2), Neg(IntLiteral(3)))))), result)
     }
 
     @Test
@@ -211,9 +223,9 @@ class ParserImplTest {
                 Token(TokenType.TIMES, 0, "4 *"),
                 Token(TokenType.DICE, 0, "d6")))
         assertEquals(
-                Dif(
+                Sum(
                         Mult(2, IntLiteral(5)),
-                        Mult(4, DiceLiteral(6))
+                        Neg(Mult(4, DiceLiteral(6)))
                 )
                 , result)
     }
@@ -231,12 +243,12 @@ class ParserImplTest {
                 Token(TokenType.TIMES, 0, "4 *"),
                 Token(TokenType.DICE, 0, "d6")))
         assertEquals(
-                Dif(
+                Sum(
                         Sum(
                                 Mult(10, Mult(20, DiceLiteral(20))),
                                 Mult(2, IntLiteral(5))
                         ),
-                        Mult(4, DiceLiteral(6))
+                        Neg(Mult(4, DiceLiteral(6)))
                 ), result)
     }
 
