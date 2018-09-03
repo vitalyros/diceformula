@@ -1,19 +1,18 @@
-package vitalyros.diceformula.executor
+package vitalyros.diceformula.runtime
 
-import vitalyros.diceformula.exec.SyncExecution
 import vitalyros.diceformula.translator.*
 import java.util.*
 
-class StackExecution(executable: Executable) : SyncExecution {
+class JavaSyncRuntime(executable: Executable, val diceRoller: DiceRoller) : SyncRuntime {
     val stack = ArrayDeque<Any>()
-    val steps = executable.steps
+    val commands = executable.commands
     val random = Random()
 
     override fun exec(): Any {
-        steps.forEach { step ->
-            when (step) {
-                is RollDice ->  stack.push(random.nextInt(step.sides) + 1)
-                is PushInt -> stack.push(step.value)
+        commands.forEach { command ->
+            when (command) {
+                is RollDice ->  stack.push(diceRoller.roll(command.sides))
+                is PushInt -> stack.push(command.value)
                 is NegateInt -> stack.push(-1 * popInt())
                 is SumInts -> stack.push(popInt() + popInt())
                 is AnyArray -> {
@@ -27,13 +26,13 @@ class StackExecution(executable: Executable) : SyncExecution {
         }
         val result = stack.pop()
         if (stack.size > 0) {
-            // Throw error
+            throw RuntimeError("Unexpected finishing state. Stack not empty after execution finished. Stack: $stack")
         }
         if (result == null) {
-            // Throw error
+            throw RuntimeError("Unexpected finishing state. Empty execution result.")
         }
-        if (result !is Array<*> || result !is Int) {
-            // Throw error
+        if (result !is Array<*> && result !is Int) {
+            throw RuntimeError("Unexpected finishing state. Unexpected execution result type. Result: $result")
         }
         return result
     }
@@ -43,17 +42,16 @@ class StackExecution(executable: Executable) : SyncExecution {
         if (value is Int) {
             return value
         } else {
-            // Throw error
-            throw Exception()
+            throw RuntimeError("Unexpected type popped. Expected ${Int::class.java}, got ${value.javaClass}")
         }
     }
 
     fun popIntArray() : Array<Int> {
-        val array = stack.pop()
-        if (array is Array<*>) {
-            return array as Array<Int>
+        val value = stack.pop()
+        if (value is Array<*>) {
+            return value as Array<Int>
         } else {
-            throw Exception()
+            throw RuntimeError("Unexpected type popped. Expected ${Array<Int>::class.java}, got ${value.javaClass}")
         }
     }
 }
