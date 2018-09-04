@@ -11,6 +11,7 @@ class Executable(val commands: Array<Command>)
 interface Command
 data class PushInt(val value: Int) : Command
 data class RollDice(val sides: Int) : Command
+data class JoinToArray(val count: Int) : Command
 class SumInts : Command
 class NegateInt : Command
 

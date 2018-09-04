@@ -15,6 +15,13 @@ class JavaSyncRuntime(executable: Executable, val diceRoller: DiceRoller) : Sync
                 is PushInt -> stack.push(command.value)
                 is NegateInt -> stack.push(-1 * popInt())
                 is SumInts -> stack.push(popInt() + popInt())
+                is JoinToArray -> {
+                    val result = (0 .. command.count - 1).map {
+                        popInt()
+                    }.toTypedArray()
+                    result.reverse()
+                    stack.push(result)
+                }
                 is AnyArray -> {
                     val array =  popIntArray()
                     stack.push(array[random.nextInt(array.size)])
