@@ -5,8 +5,8 @@ import vitalyros.diceformula.parser.*
 class SyntaxImpl : Syntax {
     override fun build(e: Expression): Operation {
         return when(e) {
-            is DiceLiteral -> RollDice(e.sides)
-            is IntLiteral -> UseInt(e.value)
+            is DiceLiteral -> RollDiceOperation(e.sides)
+            is IntLiteral -> UseIntOperation(e.value)
 
             is Sum -> buildSum(e)
             is Neg -> buildNeg(e)
@@ -22,10 +22,10 @@ class SyntaxImpl : Syntax {
     private fun buildFun(e : Fun) : Operation {
         val op = build(e.exp)
         return when (e.name) {
-            "sum" -> SumFun(checkFunTypeArray(e, op))
-            "max" -> MaxFun(checkFunTypeArray(e, op))
-            "min" -> MinFun(checkFunTypeArray(e, op))
-            "any" -> AnyFun(checkFunTypeArray(e, op))
+            "sum" -> SumFunOperation(checkFunTypeArray(e, op))
+            "max" -> MaxFunOperation(checkFunTypeArray(e, op))
+            "min" -> MinFunOperation(checkFunTypeArray(e, op))
+            "any" -> AnyFunOperation(checkFunTypeArray(e, op))
             else -> throw SyntaxException("Unexpected function $e")
         }
     }
@@ -41,8 +41,8 @@ class SyntaxImpl : Syntax {
     private fun buildMult(e : Mult) : Operation {
         val op = build(e.exp)
         return when (op) {
-            is DiceOperation -> PerformTimes(e.multiplier, op)
-            is IntOperation -> MultByInt(e.multiplier, op)
+            is DiceOperation -> PerformTimesOperation(e.multiplier, op)
+            is IntOperation -> MultByIntOperation(e.multiplier, op)
             is ArrayOperation -> throw SyntaxException("Right side of a multiplication expected to return integer. ${e.exp}")
             else ->  throw SyntaxException("Unknown type of the left side operation for multiplication ${e.exp}")
         }
@@ -58,9 +58,9 @@ class SyntaxImpl : Syntax {
             throw SyntaxException("Right side of a sum expected to return integer. ${e.exp2}")
         }
         return if (op1 is DiceOperation || op2 is DiceOperation) {
-            DiceSum(op1, op2)
+            DiceSumOperation(op1, op2)
         } else {
-            IntSum(op1, op2)
+            IntSumOperation(op1, op2)
         }
     }
 
@@ -69,7 +69,7 @@ class SyntaxImpl : Syntax {
         if (op !is IntOperation) {
             throw SyntaxException("Right side of a dif expected to return integer. ${e.exp}")
         } else {
-            return NegateInt(op)
+            return NegateIntOperation(op)
         }
     }
 }

@@ -9,24 +9,24 @@ class SyntaxImplTest {
 
     @Test
     fun testIntLiteral() {
-        assertEquals(UseInt(10),
+        assertEquals(UseIntOperation(10),
                 syntax.build(IntLiteral(10)))
     }
 
     @Test
     fun testMultInt() {
-        assertEquals(MultByInt(2, MultByInt(15, UseInt(10))),
+        assertEquals(MultByIntOperation(2, MultByIntOperation(15, UseIntOperation(10))),
                 syntax.build(Mult(2, Mult(15, IntLiteral(10)))))
     }
 
     @Test
     fun testIntArithmetic() {
         assertEquals(
-                IntSum(
-                        MultByInt(1, IntSum(UseInt(2), UseInt(3))),
-                        NegateInt(MultByInt(4, IntSum(
-                                MultByInt(5, IntSum(UseInt(6), UseInt(7))),
-                                MultByInt(8, MultByInt(9, IntSum(UseInt(10), NegateInt(UseInt(11)))))
+                IntSumOperation(
+                        MultByIntOperation(1, IntSumOperation(UseIntOperation(2), UseIntOperation(3))),
+                        NegateIntOperation(MultByIntOperation(4, IntSumOperation(
+                                MultByIntOperation(5, IntSumOperation(UseIntOperation(6), UseIntOperation(7))),
+                                MultByIntOperation(8, MultByIntOperation(9, IntSumOperation(UseIntOperation(10), NegateIntOperation(UseIntOperation(11)))))
                         ))))
                 ,
                 syntax.build(
@@ -47,43 +47,43 @@ class SyntaxImplTest {
 
     @Test
     fun testDiceLiteral() {
-        assertEquals(RollDice(20),
+        assertEquals(RollDiceOperation(20),
                 syntax.build(DiceLiteral(20)))
     }
 
     @Test
     fun rollSeveralDice() {
-        assertEquals(PerformTimes(10, RollDice(20)),
+        assertEquals(PerformTimesOperation(10, RollDiceOperation(20)),
                 syntax.build(Mult(10, DiceLiteral(20))))
     }
 
     @Test
     fun rollAndAddMultipleTimes() {
-        assertEquals(PerformTimes(3, DiceSum(RollDice(20), UseInt(5))),
+        assertEquals(PerformTimesOperation(3, DiceSumOperation(RollDiceOperation(20), UseIntOperation(5))),
                 syntax.build(Mult(3, Sum(DiceLiteral(20), IntLiteral(5)))))
     }
 
     @Test
     fun rollAndAddMultipleTimesThenChooseMax() {
-        assertEquals(MaxFun(PerformTimes(3, DiceSum(RollDice(20), UseInt(5)))),
+        assertEquals(MaxFunOperation(PerformTimesOperation(3, DiceSumOperation(RollDiceOperation(20), UseIntOperation(5)))),
                 syntax.build(Fun("max", Mult(3, Sum(DiceLiteral(20), IntLiteral(5))))))
     }
 
     @Test
     fun minFun() {
-        assertEquals(MinFun(PerformTimes(3, RollDice(20))),
+        assertEquals(MinFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
                 syntax.build(Fun("min", Mult(3, DiceLiteral(20)))))
     }
 
     @Test
     fun anyFun() {
-        assertEquals(AnyFun(PerformTimes(3, RollDice(20))),
+        assertEquals(AnyFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
                 syntax.build(Fun("any", Mult(3, DiceLiteral(20)))))
     }
 
     @Test
     fun sumFun() {
-        assertEquals(SumFun(PerformTimes(3, RollDice(20))),
+        assertEquals(SumFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
                 syntax.build(Fun("sum", Mult(3, DiceLiteral(20)))))
     }
 }

@@ -9,13 +9,14 @@ interface SyncRuntime {
 class Executable(val commands: Array<Command>)
 
 interface Command
-data class PushInt(val value: Int) : Command
-data class RollDice(val sides: Int) : Command
-data class JoinToArray(val count: Int) : Command
-class SumInts : Command
-class NegateInt : Command
+data class PushIntCommand(val value: Int) : Command
+data class RollDiceCommand(val sides: Int) : Command
+data class JoinToArrayCommand(val count: Int) : Command
+class MultIntsCommand : Command
+class SumIntsCommand : Command
+class NegateIntCommand : Command
 
-class SumArray : Command
-class AnyArray : Command
-class MaxArray : Command
-class MinArray : Command
+class SumArrayCommand : Command
+class AnyArrayCommand : Command
+class MaxArrayCommand : Command
+class MinArrayCommand : Command

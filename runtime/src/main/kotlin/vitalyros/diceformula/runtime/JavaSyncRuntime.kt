@@ -1,6 +1,5 @@
 package vitalyros.diceformula.runtime
 
-import vitalyros.diceformula.translator.*
 import java.util.*
 
 class JavaSyncRuntime(executable: Executable, val diceRoller: DiceRoller) : SyncRuntime {
@@ -11,24 +10,25 @@ class JavaSyncRuntime(executable: Executable, val diceRoller: DiceRoller) : Sync
     override fun exec(): Any {
         commands.forEach { command ->
             when (command) {
-                is RollDice ->  stack.push(diceRoller.roll(command.sides))
-                is PushInt -> stack.push(command.value)
-                is NegateInt -> stack.push(-1 * popInt())
-                is SumInts -> stack.push(popInt() + popInt())
-                is JoinToArray -> {
+                is RollDiceCommand ->  stack.push(diceRoller.roll(command.sides))
+                is PushIntCommand -> stack.push(command.value)
+                is NegateIntCommand -> stack.push(-1 * popInt())
+                is SumIntsCommand -> stack.push(popInt() + popInt())
+                is MultIntsCommand -> stack.push(popInt() * popInt())
+                is JoinToArrayCommand -> {
                     val result = (0 .. command.count - 1).map {
                         popInt()
                     }.toTypedArray()
                     result.reverse()
                     stack.push(result)
                 }
-                is AnyArray -> {
+                is AnyArrayCommand -> {
                     val array =  popIntArray()
                     stack.push(array[random.nextInt(array.size)])
                 }
-                is MaxArray -> stack.push(popIntArray().reduce { acc, value -> if (acc < value) value else acc })
-                is MinArray -> stack.push(popIntArray().reduce { acc, value -> if (acc > value) value else acc })
-                is SumArray -> stack.push(popIntArray().reduce { acc, value -> acc + value })
+                is MaxArrayCommand -> stack.push(popIntArray().reduce { acc, value -> if (acc < value) value else acc })
+                is MinArrayCommand -> stack.push(popIntArray().reduce { acc, value -> if (acc > value) value else acc })
+                is SumArrayCommand -> stack.push(popIntArray().reduce { acc, value -> acc + value })
             }
         }
         val result = stack.pop()
