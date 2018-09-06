@@ -4,4 +4,5 @@ include 'parser'
 include 'syntax'
 include 'translator'
 include 'runtime'
+include 'core'
 

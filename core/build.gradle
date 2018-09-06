@@ -1,0 +1,11 @@
+group project.parent.group
+version project.parent.version
+
+dependencies {
+    compile project(":common")
+    compile project(":lexer")
+    compile project(":parser")
+    compile project(":syntax")
+    compile project(":translator")
+    compile project(":runtime")
+}

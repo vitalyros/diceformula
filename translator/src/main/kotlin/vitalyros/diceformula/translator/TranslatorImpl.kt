@@ -26,6 +26,11 @@ class TranslatorImpl() : Translator {
                 doTranslate(operation.op2, acc)
                 acc.add(SumIntsCommand())
             }
+            is DiceSumOperation -> {
+                doTranslate(operation.op1, acc)
+                doTranslate(operation.op2, acc)
+                acc.add(SumIntsCommand())
+            }
             is MultByIntOperation -> {
                 doTranslate(operation.op, acc)
                 acc.add(PushIntCommand(operation.value))
