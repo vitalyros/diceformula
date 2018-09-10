@@ -9,37 +9,37 @@ class SyntaxImplTest {
 
     @Test
     fun testIntLiteral() {
-        assertEquals(UseIntOperation(10),
-                syntax.build(IntLiteral(10)))
+        assertEquals(UseIntOp(10),
+                syntax.build(IntLiteralExpr(10)))
     }
 
     @Test
     fun testMultInt() {
-        assertEquals(MultByIntOperation(2, MultByIntOperation(15, UseIntOperation(10))),
-                syntax.build(Mult(2, Mult(15, IntLiteral(10)))))
+        assertEquals(MultByIntOp(2, MultByIntOp(15, UseIntOp(10))),
+                syntax.build(MultExpr(2, MultExpr(15, IntLiteralExpr(10)))))
     }
 
     @Test
     fun testIntArithmetic() {
         assertEquals(
-                IntSumOperation(
-                        MultByIntOperation(1, IntSumOperation(UseIntOperation(2), UseIntOperation(3))),
-                        NegateIntOperation(MultByIntOperation(4, IntSumOperation(
-                                MultByIntOperation(5, IntSumOperation(UseIntOperation(6), UseIntOperation(7))),
-                                MultByIntOperation(8, MultByIntOperation(9, IntSumOperation(UseIntOperation(10), NegateIntOperation(UseIntOperation(11)))))
+                IntSumOp(
+                        MultByIntOp(1, IntSumOp(UseIntOp(2), UseIntOp(3))),
+                        NegateIntOp(MultByIntOp(4, IntSumOp(
+                                MultByIntOp(5, IntSumOp(UseIntOp(6), UseIntOp(7))),
+                                MultByIntOp(8, MultByIntOp(9, IntSumOp(UseIntOp(10), NegateIntOp(UseIntOp(11)))))
                         ))))
                 ,
                 syntax.build(
                         //  1 * (2 + 3) - 4 * ( 5 * (6 + 7) + 8 * 9 * (10 - 11))
-                        Sum(
+                        SumExpr(
                                 //  1 * (2 + 3)
-                                Mult(1, Braces(Sum(IntLiteral(2), IntLiteral(3)))),
+                                MultExpr(1, BracesExpr(SumExpr(IntLiteralExpr(2), IntLiteralExpr(3)))),
                                 //  4 * ( 5 * (6 + 7) + 8 * 9 * (10 - 11))
-                                Neg(Mult(4, Braces(Sum(
+                                NegExpr(MultExpr(4, BracesExpr(SumExpr(
                                         // 5 * (6 + 7)
-                                        Mult(5, Braces(Sum(IntLiteral(6), IntLiteral(7)))),
+                                        MultExpr(5, BracesExpr(SumExpr(IntLiteralExpr(6), IntLiteralExpr(7)))),
                                         // 8 * 9 * (10 - 11)
-                                        Mult(8, Mult(9, Braces(Sum(IntLiteral(10), Neg(IntLiteral(11))))))
+                                        MultExpr(8, MultExpr(9, BracesExpr(SumExpr(IntLiteralExpr(10), NegExpr(IntLiteralExpr(11))))))
                                 ))))
                         )
                 ))
@@ -47,43 +47,43 @@ class SyntaxImplTest {
 
     @Test
     fun testDiceLiteral() {
-        assertEquals(RollDiceOperation(20),
-                syntax.build(DiceLiteral(20)))
+        assertEquals(RollDiceOp(20),
+                syntax.build(DiceLiteralExpr(20)))
     }
 
     @Test
     fun rollSeveralDice() {
-        assertEquals(PerformTimesOperation(10, RollDiceOperation(20)),
-                syntax.build(Mult(10, DiceLiteral(20))))
+        assertEquals(PerformTimesOp(10, RollDiceOp(20)),
+                syntax.build(MultExpr(10, DiceLiteralExpr(20))))
     }
 
     @Test
     fun rollAndAddMultipleTimes() {
-        assertEquals(PerformTimesOperation(3, DiceSumOperation(RollDiceOperation(20), UseIntOperation(5))),
-                syntax.build(Mult(3, Sum(DiceLiteral(20), IntLiteral(5)))))
+        assertEquals(PerformTimesOp(3, DiceSumOp(RollDiceOp(20), UseIntOp(5))),
+                syntax.build(MultExpr(3, SumExpr(DiceLiteralExpr(20), IntLiteralExpr(5)))))
     }
 
     @Test
     fun rollAndAddMultipleTimesThenChooseMax() {
-        assertEquals(MaxFunOperation(PerformTimesOperation(3, DiceSumOperation(RollDiceOperation(20), UseIntOperation(5)))),
-                syntax.build(Fun("max", Mult(3, Sum(DiceLiteral(20), IntLiteral(5))))))
+        assertEquals(MaxFunOp(PerformTimesOp(3, DiceSumOp(RollDiceOp(20), UseIntOp(5)))),
+                syntax.build(FunExpr("max", MultExpr(3, SumExpr(DiceLiteralExpr(20), IntLiteralExpr(5))))))
     }
 
     @Test
     fun minFun() {
-        assertEquals(MinFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
-                syntax.build(Fun("min", Mult(3, DiceLiteral(20)))))
+        assertEquals(MinFunOp(PerformTimesOp(3, RollDiceOp(20))),
+                syntax.build(FunExpr("min", MultExpr(3, DiceLiteralExpr(20)))))
     }
 
     @Test
     fun anyFun() {
-        assertEquals(AnyFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
-                syntax.build(Fun("any", Mult(3, DiceLiteral(20)))))
+        assertEquals(AnyFunOp(PerformTimesOp(3, RollDiceOp(20))),
+                syntax.build(FunExpr("any", MultExpr(3, DiceLiteralExpr(20)))))
     }
 
     @Test
     fun sumFun() {
-        assertEquals(SumFunOperation(PerformTimesOperation(3, RollDiceOperation(20))),
-                syntax.build(Fun("sum", Mult(3, DiceLiteral(20)))))
+        assertEquals(SumFunOp(PerformTimesOp(3, RollDiceOp(20))),
+                syntax.build(FunExpr("sum", MultExpr(3, DiceLiteralExpr(20)))))
     }
 }

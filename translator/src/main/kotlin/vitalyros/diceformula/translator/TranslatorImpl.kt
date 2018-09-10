@@ -16,49 +16,49 @@ class TranslatorImpl() : Translator {
 
     private fun doTranslate(operation: Operation, acc: MutableList<Command>) {
         when(operation) {
-            is UseIntOperation -> acc.add(PushIntCommand(operation.value))
-            is NegateIntOperation -> {
+            is UseIntOp -> acc.add(PushIntCmd(operation.value))
+            is NegateIntOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(NegateIntCommand())
+                acc.add(NegateIntCmd())
             }
-            is IntSumOperation -> {
+            is IntSumOp -> {
                 doTranslate(operation.op1, acc)
                 doTranslate(operation.op2, acc)
-                acc.add(SumIntsCommand())
+                acc.add(SumIntsCmd())
             }
-            is DiceSumOperation -> {
+            is DiceSumOp -> {
                 doTranslate(operation.op1, acc)
                 doTranslate(operation.op2, acc)
-                acc.add(SumIntsCommand())
+                acc.add(SumIntsCmd())
             }
-            is MultByIntOperation -> {
+            is MultByIntOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(PushIntCommand(operation.value))
-                acc.add(MultIntsCommand())
+                acc.add(PushIntCmd(operation.value))
+                acc.add(MultIntsCmd())
             }
-            is RollDiceOperation -> acc.add(RollDiceCommand(operation.sides))
-            is PerformTimesOperation -> {
+            is RollDiceOp -> acc.add(RollDiceCmd(operation.sides))
+            is PerformTimesOp -> {
                 val performTimesAcc = doTranslate(operation.op)
                 repeat(operation.times) {
                     acc.addAll(performTimesAcc)
                 }
-                acc.add(JoinToArrayCommand(operation.times))
+                acc.add(JoinToArrayCmd(operation.times))
             }
-            is SumFunOperation -> {
+            is SumFunOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(SumArrayCommand())
+                acc.add(SumArrayCmd())
             }
-            is AnyFunOperation -> {
+            is AnyFunOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(AnyArrayCommand())
+                acc.add(AnyArrayCmd())
             }
-            is MaxFunOperation -> {
+            is MaxFunOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(MaxArrayCommand())
+                acc.add(MaxArrayCmd())
             }
-            is MinFunOperation -> {
+            is MinFunOp -> {
                 doTranslate(operation.op, acc)
-                acc.add(MinArrayCommand())
+                acc.add(MinArrayCmd())
             }
         }
     }

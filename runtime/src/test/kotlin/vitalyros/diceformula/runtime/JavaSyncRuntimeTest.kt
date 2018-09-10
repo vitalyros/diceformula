@@ -16,12 +16,12 @@ class JavaSyncRuntimeTest {
     @Test
     fun testRollDice() {
         `when`(diceRoller.roll(20)).thenReturn(14)
-        Assert.assertEquals(14, run(arrayOf(RollDiceCommand(20))))
+        Assert.assertEquals(14, run(arrayOf(RollDiceCmd(20))))
     }
 
     @Test
     fun testReturnInt() {
-        Assert.assertEquals(20, run(arrayOf(PushIntCommand(20))))
+        Assert.assertEquals(20, run(arrayOf(PushIntCmd(20))))
     }
 
     @Test
@@ -29,9 +29,9 @@ class JavaSyncRuntimeTest {
         `when`(diceRoller.roll(20)).thenReturn(14)
         Assert.assertEquals(26,
                 run(arrayOf(
-                        RollDiceCommand(20),
-                        PushIntCommand(12),
-                        SumIntsCommand()
+                        RollDiceCmd(20),
+                        PushIntCmd(12),
+                        SumIntsCmd()
                         )))
     }
 
@@ -41,16 +41,16 @@ class JavaSyncRuntimeTest {
         `when`(diceRoller.roll(20)).thenReturn(14, 5, 7)
         Assert.assertEquals(arrayOf(19, 10, 12).asList(),
                 (run(arrayOf(
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        JoinToArrayCommand(3)
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        JoinToArrayCmd(3)
                 )) as Array<*>).toList())
     }
 
@@ -59,17 +59,17 @@ class JavaSyncRuntimeTest {
         `when`(diceRoller.roll(20)).thenReturn(14, 5, 7)
         Assert.assertEquals(19,
                 run(arrayOf(
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        JoinToArrayCommand(3),
-                        MaxArrayCommand()
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        JoinToArrayCmd(3),
+                        MaxArrayCmd()
                 )))
     }
 
@@ -78,17 +78,17 @@ class JavaSyncRuntimeTest {
         `when`(diceRoller.roll(20)).thenReturn(14, 5, 7)
         Assert.assertTrue(
                 run(arrayOf(
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        JoinToArrayCommand(3),
-                        AnyArrayCommand()
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        JoinToArrayCmd(3),
+                        AnyArrayCmd()
                 )) in arrayOf(19, 10, 12))
     }
 
@@ -97,17 +97,17 @@ class JavaSyncRuntimeTest {
         `when`(diceRoller.roll(20)).thenReturn(14, 5, 7)
         Assert.assertEquals(10,
                 (run(arrayOf(
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        RollDiceCommand(20),
-                        PushIntCommand(5),
-                        SumIntsCommand(),
-                        JoinToArrayCommand(3),
-                        MinArrayCommand()
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        RollDiceCmd(20),
+                        PushIntCmd(5),
+                        SumIntsCmd(),
+                        JoinToArrayCmd(3),
+                        MinArrayCmd()
                 ))))
     }
 

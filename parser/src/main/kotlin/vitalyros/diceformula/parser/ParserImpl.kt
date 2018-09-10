@@ -88,7 +88,7 @@ class ParserImpl : Parser {
      */
     fun collapseIntMult() {
         val lastFinished = finishedStack.peek()
-        if (lastFinished != null && lastFinished is IntLiteral) {
+        if (lastFinished != null && lastFinished is IntLiteralExpr) {
             collapseMult()
         }
     }
@@ -99,7 +99,7 @@ class ParserImpl : Parser {
      */
     fun checkMultSugar() {
         val lastFinished = finishedStack.peek()
-        if (lastFinished != null && lastExpression != null && lastExpression == lastFinished && lastFinished is IntLiteral) {
+        if (lastFinished != null && lastExpression != null && lastExpression == lastFinished && lastFinished is IntLiteralExpr) {
             finishedStack.pop()
             pushPendingExpression(PendingMult(lastFinished.value))
         }
@@ -115,11 +115,11 @@ class ParserImpl : Parser {
                 val lastPending = pendingStack.peek()
                 when (lastPending) {
                     is PendingBraces -> {
-                        pushFinishedExpression(Braces(exp))
+                        pushFinishedExpression(BracesExpr(exp))
                         pendingStack.pop()
                     }
                     is PendingFun -> {
-                        pushFinishedExpression(Fun(lastPending.name, exp))
+                        pushFinishedExpression(FunExpr(lastPending.name, exp))
                         pendingStack.pop()
                     }
                 }
@@ -139,7 +139,7 @@ class ParserImpl : Parser {
             if (lastFinished != null) {
                 when (lastPending) {
                     is PendingMult -> {
-                        pushFinishedExpression(Mult(lastPending.mult, lastFinished))
+                        pushFinishedExpression(MultExpr(lastPending.mult, lastFinished))
                         pendingStack.pop()
                     }
                 }
@@ -159,11 +159,11 @@ class ParserImpl : Parser {
                 val lastPending = pendingStack.peek()
                 when (lastPending) {
                     is PendingSum -> {
-                        pushFinishedExpression(Sum(lastPending.exp1, exp2))
+                        pushFinishedExpression(SumExpr(lastPending.exp1, exp2))
                         pendingStack.pop()
                     }
                     is PendingDif -> {
-                        pushFinishedExpression(Sum(lastPending.exp1, Neg(exp2)))
+                        pushFinishedExpression(SumExpr(lastPending.exp1, NegExpr(exp2)))
                         pendingStack.pop()
                     }
                 }
@@ -180,8 +180,8 @@ class ParserImpl : Parser {
     }
 
 
-    private fun parseInt(token: Token) = IntLiteral(token.str.toInt())
-    private fun parseDice(token: Token) = DiceLiteral(token.str.substring(1).toInt())
+    private fun parseInt(token: Token) = IntLiteralExpr(token.str.toInt())
+    private fun parseDice(token: Token) = DiceLiteralExpr(token.str.substring(1).toInt())
     private fun parseFun(token: Token) = PendingFun(token.str.filter { it in funNameChars })
     private fun parseMult(token: Token) = PendingMult((token.str.filter { it in intChars }).toInt())
 }

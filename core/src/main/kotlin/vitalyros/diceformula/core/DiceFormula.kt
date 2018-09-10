@@ -10,10 +10,10 @@ import vitalyros.diceformula.runtime.*
 class DiceFormula {
     companion object {
         @JvmStatic
-        fun exec(source: String) = exec(source.toByteArray(), SimpleDiceRoller())
+        fun exec(source: String, diceRoller: DiceRoller = SimpleDiceRoller()) = exec(source.toByteArray(), diceRoller)
 
         @JvmStatic
-        fun exec(source: ByteArray, diceRoller: DiceRoller) : Any {
+        fun exec(source: ByteArray, diceRoller: DiceRoller = SimpleDiceRoller()) : Any {
             val parser = ParserImpl()
             val lexer = RagelLexer(parser)
             val syntax = SyntaxImpl()

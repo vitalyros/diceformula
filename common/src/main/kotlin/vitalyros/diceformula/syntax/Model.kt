@@ -3,27 +3,27 @@ package vitalyros.diceformula.syntax
 interface Operation
 
 // Arithmetic operation
-interface IntOperation : Operation
-data class UseIntOperation(val value: Int) : IntOperation
-data class NegateIntOperation(val op: IntOperation) : IntOperation
-data class IntSumOperation(val op1: IntOperation, val op2: IntOperation) : IntOperation
-data class MultByIntOperation(val value: Int, val op: IntOperation) : IntOperation
+interface IntOp : Operation
+data class UseIntOp(val value: Int) : IntOp
+data class NegateIntOp(val op: IntOp) : IntOp
+data class IntSumOp(val op1: IntOp, val op2: IntOp) : IntOp
+data class MultByIntOp(val value: Int, val op: IntOp) : IntOp
 
 // Operation that uses a dice roll or several
-interface DiceOperation : IntOperation
-data class RollDiceOperation(val sides: Int) : DiceOperation
+interface DiceOp : IntOp
+data class RollDiceOp(val sides: Int) : DiceOp
 // op1 or op2 or both are expected to contain a DiceOperation or a DiceOperation wrapped in NegateInt. That separates it from IntSum
-data class DiceSumOperation(val op1: IntOperation, val op2: IntOperation) : DiceOperation
+data class DiceSumOp(val op1: IntOp, val op2: IntOp) : DiceOp
 
 // Operation that returns an integer array as result
-interface ArrayOperation : Operation
-data class PerformTimesOperation(val times: Int, val op: DiceOperation) : ArrayOperation
+interface ArrayOp : Operation
+data class PerformTimesOp(val times: Int, val op: DiceOp) : ArrayOp
 
 
 
 // Built-in functions
-data class SumFunOperation(val op: ArrayOperation) : IntOperation
-data class MaxFunOperation(val op: ArrayOperation) : IntOperation
-data class MinFunOperation(val op: ArrayOperation) : IntOperation
-data class AnyFunOperation(val op: ArrayOperation) : IntOperation
+data class SumFunOp(val op: ArrayOp) : IntOp
+data class MaxFunOp(val op: ArrayOp) : IntOp
+data class MinFunOp(val op: ArrayOp) : IntOp
+data class AnyFunOp(val op: ArrayOp) : IntOp
 
