@@ -28,14 +28,18 @@ fun main(vararg s: String) {
 
 ## Syntax
 
+Expression in dice formula is a single line.
+During runtime the language operates with two data types: integers and arrays of integers.
+Either of those types may be a result of an execution.
+
 Two types of literals can be used in the expressions.
 - integers - e.g. 5 20 60
-- dice rolls - e.g. d20 d4 - those would cause a dice roll
+- dice rolls - e.g. d20 d4 - these would cause dice rolls
 
 Addition, multiplication and subtraction operations should work with integers. Operator precedence should work by the rules of arithmetic.
 e.g. `20 * 5 + 4 - 2` would return 102
 
-To control precedence braces can be used.
+You can use braces to control precedence.
 e.g. `20 * (20 - 4)`
 
 Addition and subtraction should work similarly with dice rolls. Integers and dice rolls can be mixed.
@@ -47,22 +51,16 @@ The operator means arithmetic multiplication.
 e.g. `10 * (20 - 4)` would simply return 160
 - If the right side of a multiplication operator calls for a dice roll: The operator means repeat X times operation. 
 The left side of a multiplication operator would be executed multiple times and the results would be accumulated into an array of integers.
-e.g. `10 * (d6 + 5)` would return an array of size 10 and each of the elements would be results of `d6 + 5` expression executions
+e.g. `10 * (d6 + 5)` would return an array of size 10 and each of the elements would be a result of `d6 + 5` expression execution
 
-The left side of a multiplication operator must be an integer, and the right side may be a complex expression.
+The left side of a multiplication operator must be an integer, the right side may be a complex expression.
 e.g. 
 expressions `50 * (d4 + 5)` and `50 * (10 + 5)` are ok but 
 expressions `(d4 + 5) * 50` or `(10 + 5) * 50` are not ok.
 
-It is ok to miss the asterisk `*` sign if the left side is a dice roll or a braced expression.
+When defining a multiplication or repeat operation it is ok to miss an asterisk `*` if the left side is a dice roll or a braced expression.
 e.g. `10d4` or `10(d4+5)` are valid expressions that include repeat 10 times operation
-and `10(4*5)` is a valid expression that includes arithmetic multiplication by 10.
-
-During runtime the language operates with two data types. 
-- integer
-- array of integers
-
-Either of those types may be a result of an execution.
+and `10(4+5)` is a valid expression that includes arithmetic multiplication by 10.
 
 Simple arithmetic operations can't be performed on the array of integers. 
 e.g. `20d4 + 10` is not ok because `20d4` is a repeat operation that will return an array of 20 values and you can't add an integer to that.
@@ -74,8 +72,8 @@ But there are special operations that can process arrays.
 - min - select and return the lowest value.
 - sum - return the sum of values.
 - any - return any single value.
-The syntax is akin to C language function call.
-e.g. `max(10d20)` would execute 10 20-sided dice rolls and return the greatest of them.
+The syntax is akin to algol language function call.
+e.g. `max(10d20)` would rol ten 20-sided dice and return the greatest value.
 
 
 
