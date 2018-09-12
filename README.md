@@ -39,7 +39,7 @@ To control precedence braces can be used.
 e.g. `20 * (20 - 4)`
 
 Addition and subtraction should work similarly with dice rolls. Integers and dice rolls can be mixed.
-e.g. `d20 - d6 + 5` : in case d20 rolls a 10 and d6 rolls a 4 - the expression should return 9.
+e.g. `d20 - d6 + 5` : in case d20 rolls a 10 and d6 rolls a 4 - the expression should return 11.
 
 Multiplication operator `*` works differently based on context:
 - If the right side of a multiplication operator is an arithmetic expression: 
