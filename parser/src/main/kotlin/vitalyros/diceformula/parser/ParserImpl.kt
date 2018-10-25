@@ -28,7 +28,7 @@ class ParserImpl : Parser {
                 pushFinishedExpression(parseInt(token))
             }
             TokenType.DICE -> {
-                checkMultSugar()
+                checkMultSugar(token)
                 pushFinishedExpression(parseDice(token))
                 collapseMult()
                 collapsePlusMinus()
@@ -37,20 +37,20 @@ class ParserImpl : Parser {
                 collapseIntMult()
                 collapsePlusMinus()
                 val lastFinished = finishedStack.peek()
-                pushPendingExpression(PendingSum(validatePlusMinus(token, lastFinished)))
+                pushPendingExpression(PendingSum(token, validatePlusMinus(token, lastFinished)))
             }
             TokenType.MINUS -> {
                 collapseIntMult()
                 collapsePlusMinus()
                 val lastFinished = finishedStack.peek()
-                pushPendingExpression(PendingDif(validatePlusMinus(token, lastFinished)))
+                pushPendingExpression(PendingDif(token, validatePlusMinus(token, lastFinished)))
             }
             TokenType.FUN_START -> {
-                checkMultSugar()
+                checkMultSugar(token)
                 pushPendingExpression(parseFun(token))
             }
             TokenType.OPEN_BRACE -> {
-                checkMultSugar()
+                checkMultSugar(token)
                 pushPendingExpression(PendingBraces(token))
             }
             TokenType.CLOSE_BRACE -> {
@@ -74,9 +74,10 @@ class ParserImpl : Parser {
         val result = finishedStack.peek()
         if (result == null) {
             if (pendingStack.isEmpty()) {
-                throw ParserException("Empty expression")
+                throw buildParserException(index = 0, reason = "Empty line found instead of expression", flavour = "Empty line is not considered a valid expression to compile or run")
             } else {
-                throw ParserException("Unfinished expression: ${pendingStack.last}}")
+                val token = pendingStack.last.token
+                throw buildParserException(index = token.col, str = token.str, reason = "Unfinished expression")
             }
         } else {
             return result
@@ -86,7 +87,7 @@ class ParserImpl : Parser {
     /**
      * Checks the last finished expression to be int and collapses all preceding unfinished multiplication expressions, if they exist
      */
-    fun collapseIntMult() {
+    private fun collapseIntMult() {
         val lastFinished = finishedStack.peek()
         if (lastFinished != null && lastFinished is IntLiteralExpr) {
             collapseMult()
@@ -97,18 +98,18 @@ class ParserImpl : Parser {
     /**
      * Checks the last finished expression to be int and substitutes it for unfinished multiplication expression
      */
-    fun checkMultSugar() {
+    private fun checkMultSugar(token: Token) {
         val lastFinished = finishedStack.peek()
         if (lastFinished != null && lastExpression != null && lastExpression == lastFinished && lastFinished is IntLiteralExpr) {
             finishedStack.pop()
-            pushPendingExpression(PendingMult(lastFinished.value))
+            pushPendingExpression(PendingMult(token, lastFinished.value))
         }
     }
 
     /**
      * Closes immediate pending open braces or function expressions
      */
-    fun collapseBraces() {
+    private fun collapseBraces() {
         val exp = finishedStack.peek()
         if (exp != null) {
             if (pendingStack.size > 0) {
@@ -130,7 +131,7 @@ class ParserImpl : Parser {
     /**
      * Collapses the chain of unfinished multiplication expressions
      */
-    fun collapseMult() {
+    private fun collapseMult() {
         var finishedCollapsing = false
         while (!finishedCollapsing && pendingStack.size > 0) {
             val depthBefore = pendingStack.size
@@ -152,7 +153,7 @@ class ParserImpl : Parser {
     /**
      * Closes immediate pending sum or dif expression
      */
-    fun collapsePlusMinus() {
+    private fun collapsePlusMinus() {
         val exp2 = finishedStack.peek()
         if (exp2 != null) {
             if (pendingStack.size > 0) {
@@ -171,24 +172,51 @@ class ParserImpl : Parser {
         }
     }
 
-    fun validatePlusMinus(token: Token, lastFinished: Expression?): Expression {
-        if (lastFinished != null && lastFinished !is PendingExpression) {
-            return lastFinished
+    private fun validatePlusMinus(token: Token, lastFinished: Expression?): Expression {
+        return if (lastFinished == null) {
+            throw buildParserException(index = token.col, reason = "Left side of \"${token.col}\" is empty, expression expected")
+        } else if (lastFinished is PendingExpression) {
+            throw buildParserException(index = token.col, reason = "Left side of \"${token.col}\" is an unfinished expression")
         } else {
-            throw ParserException("Finished expression expected on the left side of ${token.str}")
+            lastFinished
         }
     }
 
-
     private fun parseInt(token: Token) = IntLiteralExpr(token.str.toInt())
     private fun parseDice(token: Token) = DiceLiteralExpr(token.str.substring(1).toInt())
-    private fun parseFun(token: Token) = PendingFun(token.str.filter { it in funNameChars })
-    private fun parseMult(token: Token) = PendingMult((token.str.filter { it in intChars }).toInt())
+    private fun parseFun(token: Token) = PendingFun(token, token.str.filter { it in funNameChars })
+    private fun parseMult(token: Token) = PendingMult(token, (token.str.filter { it in intChars }).toInt())
 }
 
-private interface PendingExpression : Expression
-private data class PendingSum(val exp1: Expression) : PendingExpression
-private data class PendingDif(val exp1: Expression) : PendingExpression
-private data class PendingFun(val name: String) : PendingExpression
-private data class PendingBraces(val token: Token) : PendingExpression
-private data class PendingMult(val mult: Int) : PendingExpression
+fun buildParserException(index: Int? = null, str: String? = null, reason: String? = null, flavour: String? = null) : ParserException {
+    val indexExpression = if (index == null) {
+        ""
+    } else {
+        " at index: $index"
+    }
+    val tokenExpression = if (str == null) {
+        ""
+    } else {
+        "Failed to parse token: $str. "
+    }
+    val reasonExpression = if (reason == null) {
+        ""
+    } else {
+        "Reason: $reason."
+    }
+    val flavourExpression = if (flavour == null) {
+        ""
+    } else {
+        "\n$flavour"
+    }
+    return ParserException("Parser Error$indexExpression. $tokenExpression$reasonExpression$flavourExpression")
+}
+
+private interface PendingExpression : Expression {
+    val token: Token
+}
+private data class PendingSum(override val token: Token, val exp1: Expression) : PendingExpression
+private data class PendingDif(override val token: Token, val exp1: Expression) : PendingExpression
+private data class PendingFun(override val token: Token, val name: String) : PendingExpression
+private data class PendingBraces(override val token: Token) : PendingExpression
+private data class PendingMult(override val token: Token, val mult: Int) : PendingExpression

@@ -11,4 +11,3 @@ data class FunExpr(val name: String, val exp: Expression) : Expression
 
 data class MultExpr(val multiplier: Int, val exp: Expression) : Expression
 data class BracesExpr(val exp: Expression) : Expression
-
